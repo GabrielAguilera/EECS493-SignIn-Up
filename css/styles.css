@@ -5,11 +5,11 @@ body {
 }
 
 #main {
-    width: 500px;
+    width: auto;
     margin: auto;
     text-align: left;
-    background: white;
-    padding: 50px 60px;
+    background: orange;
+    padding: 30px 60px;
     border: solid #ddd;
     border-width: 0 1px 1px 1px;
 }
@@ -17,6 +17,7 @@ body {
 #main h1 {
     margin-top: 0;
     font-size: 35px;
+    color: green;
 }
 
 #main ul {
