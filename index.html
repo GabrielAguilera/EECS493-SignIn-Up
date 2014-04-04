@@ -12,7 +12,7 @@
   <SCRIPT TYPE="text/javascript">
   Parse.initialize("PAjzQPglIFtzZyMJfDPe5Ozvfzr7Pz1ukpHoLXct", "zTU8emhQIg5xTKZrhfF5ulrKnXQv4M6ztT9kFi90");
 
-  function Login()
+  function SignUp()
   {
     Parse.User.signUp(document.loginForm.username.value,
                        document.loginForm.password.value,
@@ -51,7 +51,7 @@
         <input type = "password" name="password" placeholder="Password">
         <input type = "text"     name="email"    placeholder="Email">
         <br>
-        <input type = "submit" value="submit"  onClick="Login()">
+        <input type = "submit" value="submit"  onClick="SignUp()">
       </form>
     </div>
   </div>
