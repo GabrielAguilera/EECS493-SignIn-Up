@@ -9,84 +9,50 @@
   <link rel="stylesheet" href="css/styles.css">
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
   <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
-  
+  <SCRIPT TYPE="text/javascript">
+  Parse.initialize("PAjzQPglIFtzZyMJfDPe5Ozvfzr7Pz1ukpHoLXct", "zTU8emhQIg5xTKZrhfF5ulrKnXQv4M6ztT9kFi90");
 
-    
-
-
-  <script>
-    function parseSignIn(form)
+  function Login()
+  {
+    Parse.User.signUp(document.loginForm.username.value,
+                       document.loginForm.password.value,
+  {
+    success: function(user)
     {
-      if (error.code === Parse.Error.CONNECTION_FAILED) {
-            alert("Uh oh, we couldn't even connect to the Parse Cloud!");
-          }
-          else if (error.code === Parse.Error.OBJECT_NOT_FOUND) {
-            alert("Uh oh, we couldn't find the object!");
-          }
-          else{
-            alert("Error: " + error.code + " " + error.message);
-          }
+
+    },
+    error: function(user, error)
+    {
+      alert('error ' + error);
     }
-  </script>
+  });
+    alert("Tried to sign up!");
+  }
+
+  </SCRIPT>
+
+
 
 </head>
 
 <body>
   <div id="main">
   <script type="text/javascript">
-    Parse.initialize("PAjzQPglIFtzZyMJfDPe5Ozvfzr7Pz1ukpHoLXct", "zTU8emhQIg5xTKZrhfF5ulrKnXQv4M6ztT9kFi90");
   </script>
     
     <h1>Welcome to Fitness Carrot!</h1>
 
     <p> Please sign up or sign in below: </p>
-    <!-- <p>Read the documentation and start building your JavaScript app:</p>
 
-    <ul>
-      <li><a href="https://www.parse.com/docs/js_guide">Parse JavaScript Guide</a></li>
-      <li><a href="https://www.parse.com/docs/js">Parse JavaScript API Documentation</a></li>
-    </ul> -->
-
-    <FORM NAME = "signUp" ACTION = "" METHOD="GET">Sign Up: <BR>
-      <input type="text" NAME="login-username" placeholder="Username" />
-      <input type="password" NAME="login-password" placeholder="Password" /> <BR>
-      <input type="email" NAME="login-email" placeholder="Email" /> 
-      <BR>
-      <input type="submit" NAME="button" Value="Sign Up" onClick="parseSignUp(this.form)">
-    </FORM>
-    
-    <p> </p>
-    
-    <FORM NAME = "signIn" ACTION = "" METHOD="GET">Sign In: <BR>
-      <input type="text" NAME="login-username" placeholder="Username" /> <BR>
-      <input type="password" NAME="login-password" placeholder="Password" /> <BR>
-      <input type="submit" NAME="button" Value="Sign In" onClick="parseSignIn(this.form)">
-    </FORM>
-
-
-  <script type="text/javascript">
-
-    var user = new Parse.User();
-    user.set("username", "my name");
-    user.set("password", "my pass");
-    user.set("email", "email@example.com");
-     
-    // other fields can be set just like with Parse.Object
-    user.set("phone", "415-392-0202");
-     
-    user.signUp(null, {
-      success: function(user) {
-        // Hooray! Let them use the app now.
-      },
-      error: function(user, error) {
-        // Show the error message somewhere and let the user try again.
-        alert("Error: " + error.code + " " + error.message);
-      }
-    });
-  </script>
-      
-    <div style="display:none" class="error">
-      Looks like there was a problem saving the test object. Make sure you've set your application ID and javascript key correctly in the call to <code>Parse.initialize</code> in this file.
+    <div class="login-form">
+      Login <br>
+      <form name = "loginForm">
+        <input type = "text"     name="username" placeholder="Username">
+        <input type = "password" name="password" placeholder="Password">
+        <input type = "text"     name="email"    placeholder="Email">
+        <br>
+        <input type = "submit" value="submit"  onClick="Login()">
+      </form>
     </div>
   </div>
 </body>
