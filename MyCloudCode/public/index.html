@@ -2,25 +2,36 @@
 <head>
   <meta charset="utf-8">
 
-  <title>My Parse App</title>
-  <meta name="description" content="My Parse App">
+  <title>Fitness Carrot</title>
+  <meta name="description" content="Fitness Carrot - An application developed in EECS 493 - User Interfaces, W'14">
   <meta name="viewport" content="width=device-width">
   <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/styles.css">
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-  <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.2.7.min.js"></script>
+  <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
 </head>
 
 <body>
-  
   <div id="main">
+
+    <h1>Welcome to Fitness Carrot!</h1>
+
+    <p>Please sign up or sign in below: </p>
+
+    
     <input type="text" class="textinput" id="login-username" placeholder="Username"/>
     <input type="password" class="textinput" id="login-password" placeholder="Password"/>
+    <br>
     <input type="button" class="buttoninput" id="LogIn" value="Log In"/>
-    <br />
+    <p> </p>
+    <!-- Sign Up <br> -->
     <input type="text" id="signup-username" placeholder="Username" class="textinput"/>
     <input type="password" id="signup-password" placeholder="Create a Password"class="textinput"/>
+    <br>
+    <input type="email" id="signup-email" placeholder="Email" class="textinput"/>
+    <br>
     <input type="button" id="SignUp" value="Sign Up" class="buttoninput"/>
+
   </div>
 
   <script type="text/javascript">
@@ -30,18 +41,20 @@
           $("#SignUp").click(function () { //when button with id="SignUp" is clicked
               var Username = $("#signup-username").val(); // set var Username = input with id="signup-username"
               var PassWord = $("#signup-password").val(); // set var PassWord = input with id="signup-password"
+              var Email = $("#signup-email").val(); //set var Email = input with id="signup-password"
 
 
               var user = new Parse.User(); // creates a new Parse user object
               user.set("username", Username.toString()); //creates a "username" field in the database and sets it to Username
               user.set("password", PassWord.toString()); //creates a "password" field in the database and sets it to PassWord
+              user.set("email", Email.toString()); //creates a "email" field in the database and sets it to Email
 
-              user.set("ACL", new Parse.ACL());          //creates a "ACL" field in the database and sets it to Read and Wright for the user.
+              user.set("ACL", new Parse.ACL());          //creates a "ACL" field in the database and sets it to Read and Write for the user.
 
               user.signUp(null, {
                   success: function (user) {
                       // Parse.user saved
-                      alert("Welcome to my app");
+                      alert("Welcome to Fitness Carrot!");
                   },
                   error: function (user, error) {
                       // Show the error message somewhere and let the user try again.
@@ -71,9 +84,7 @@
               });
           });
       });
-    
-    
   </script>
-</body>
+</body> 
 
 </html>
