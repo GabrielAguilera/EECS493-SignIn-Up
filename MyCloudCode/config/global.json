@@ -1,0 +1,14 @@
+{
+    "applications": {
+        "Fitness Carrot - EECS 493": {
+            "applicationId": "PAjzQPglIFtzZyMJfDPe5Ozvfzr7Pz1ukpHoLXct", 
+            "masterKey": "jOzyKlnVimTy4E1pBlB35U0gvoABklCw0SA73jVD"
+        }, 
+        "_default": {
+            "link": "Fitness Carrot - EECS 493"
+        }
+    }, 
+    "global": {
+        "parseVersion": "1.2.18"
+    }
+}
