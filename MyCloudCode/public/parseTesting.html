@@ -31,28 +31,47 @@
               // if login is successful
               alert("Welcome, " + user.get("firstName") + " " + user.get("lastName"));
               
-              //Creates a subclass of Parse.Object
-              var ExerciseInput = Parse.Object.extend("ExerciseInput");
-              //Calls the constructor for the class
-              var exerciseInput = new ExerciseInput();
-              //Sets the variables
-              exerciseInput.set("date", 1950);
-              exerciseInput.set("value", -0.307);
-              exerciseInput.set("parent", user);
-              //Saves it to parse
-              exerciseInput.save(null,{
-                success: function(exerciseInput) {
-                  alert("New object created with objectId: " + exerciseInput.id);
-                  //Pushes the new object to the end of the exerciseInput array
-                  user.add("exerciseEntries", exerciseInput);
-                  //Saves it to parse again.
-                  user.save();
-                },
-                error: function(exerciseInput, error) {
-                  // inspect error
-                  alert("failed to create new object, with error code: " + error.description);
-                }
-              });
+              var temp = user.get("exerciseEntries");
+              var aA = user.get("achievementArray");
+              
+              for(var i = 0; i < aA.length; i++){
+                alert(aA[i]);
+              }
+
+              for (var i = 0; i < 13; i++){
+              //  alert(temp[i]/*.get("date") + ", " + temp.get("value")*/);
+              };
+
+              // //Creates a subclass of Parse.Object
+              // var ExerciseInput = Parse.Object.extend("ExerciseInput");
+              // //Calls the constructor for the class
+              // var exerciseInput = new ExerciseInput();
+              // //Sets the variables
+              // exerciseInput.set("date", 1950);
+              // exerciseInput.set("value", -0.307);
+              // exerciseInput.set("parent", user);
+              // //Saves it to parse
+              // exerciseInput.save(null,{
+              //   success: function(exerciseInput) {
+              //     alert("New object created with objectId: " + exerciseInput.id);
+              //     //Pushes the new object to the end of the arrays
+              //     user.add("exerciseEntries", exerciseInput);
+              //     user.add("weightEntries", exerciseInput);
+              //     user.add("calorieEntries", exerciseInput);
+              //     //Saves it to parse again.
+              //     user.save();
+
+              //     //var query = new Parse.Query(ExerciseInput);
+              //     //for()
+
+              //     //query.equalTo("")
+              //     //alert(user.exerciseEntries->)
+              //   },
+              //   error: function(exerciseInput, error) {
+              //     // inspect error
+              //     alert("failed to create new object, with error code: " + error.description);
+              //   }
+              // });
           },
           error: function (user, error) {
               // Show the error message somewhere and let the user try again.
