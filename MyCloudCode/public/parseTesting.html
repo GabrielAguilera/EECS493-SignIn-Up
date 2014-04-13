@@ -1,3 +1,4 @@
+
 <!doctype html>
 <head>
   <meta charset="utf-8">
@@ -32,18 +33,19 @@
 
               //var graphInfo[] = user.get(ExerciseEntries);
               
-              var TestObject = Parse.Object.extend("TestObject");
-              var testObject = new TestObject();
-              testObject.set("year", 1950);
-              testObject.set("value", -0.307);
-  //            testObject.id = "cwlnEHE340";
-    //          testObject.add("1950", -0.307);
-              testObject.save(null,{
-                success: function(testObject) {
-                  alert("New object created with objectId: " + testObject.id);
+              var ExerciseInput = Parse.Object.extend("ExerciseInput");
+              var exerciseInput = new ExerciseInput();
+              exerciseInput.set("date", 1950);
+              exerciseInput.set("value", -0.307);
+
+              exerciseInput.save(null,{
+                success: function(exerciseInput) {
+                  alert("New object created with objectId: " + exerciseInput.id);
+                  user.add("exerciseEntries", exerciseInput);
+                  user.save();
                   // save succeeded
                 },
-                error: function(testObject, error) {
+                error: function(exerciseInput, error) {
                   // inspect error
                   alert("failed to create new object, with error code: " + error.description);
                 }
