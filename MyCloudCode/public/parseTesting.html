@@ -1,0 +1,61 @@
+<!doctype html>
+<head>
+  <meta charset="utf-8">
+
+  <title>Fitness Carrot</title>
+  <meta name="description" content="Fitness Carrot - An application developed in EECS 493 - User Interfaces, W'14">
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.2.18.min.js"></script>
+</head>
+
+<body>
+  <div id="main">
+
+
+
+
+    <script type="text/javascript">
+        Parse.initialize("PAjzQPglIFtzZyMJfDPe5Ozvfzr7Pz1ukpHoLXct", "zTU8emhQIg5xTKZrhfF5ulrKnXQv4M6ztT9kFi90");
+
+      Parse.User.logOut();
+      var username = "username";
+      var password = "password";
+
+
+      Parse.User.logIn(username, password, {
+          success: function (user) {
+              // if login is successful
+              alert("Welcome, " + user.get("firstName") + " " + user.get("lastName"));
+
+              //var graphInfo[] = user.get(ExerciseEntries);
+              
+              var TestObject = Parse.Object.extend("TestObject");
+              var testObject = new TestObject();
+              testObject.set("year", 1950);
+              testObject.set("value", -0.307);
+  //            testObject.id = "cwlnEHE340";
+    //          testObject.add("1950", -0.307);
+              testObject.save(null,{
+                success: function(testObject) {
+                  alert("New object created with objectId: " + testObject.id);
+                  // save succeeded
+                },
+                error: function(testObject, error) {
+                  // inspect error
+                  alert("failed to create new object, with error code: " + error.description);
+                }
+              });
+          },
+          error: function (user, error) {
+              // Show the error message somewhere and let the user try again.
+              alert("Error: " + error.code + " " + error.message);
+          }
+      });
+    </script>
+
+  </div>
+</body>
+</html>
