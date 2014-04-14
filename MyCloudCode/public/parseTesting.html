@@ -33,14 +33,46 @@
               
               var temp = user.get("exerciseEntries");
               var aA = user.get("achievementArray");
-              
+
               for(var i = 0; i < aA.length; i++){
-                alert(aA[i]);
+                //alert(aA[i]);
               }
 
-              for (var i = 0; i < 13; i++){
-              //  alert(temp[i]/*.get("date") + ", " + temp.get("value")*/);
-              };
+              for(var i = 0; i < 1; i++){
+                var ExerciseInput = Parse.Object.extend("ExerciseInput");
+                var query = new Parse.Query(ExerciseInput);
+                query.include('user');
+ //               query.equalTo("parent", {
+   //                 __type: "Pointer",
+     //               className: "__User",
+       //             objectId: user.id
+         //       });
+                //var queryInput = new Parse.Query(ExerciseInput).include('user');
+                //queryInput.get(get)
+                //var output = new ExerciseInput();
+                //var output = temp[i];
+                //alert(output.objectId);
+                //var query = new Parse.Query(ExerciseInput);
+                // query.include("User");
+
+                // query.equalTo("User", user);
+                query.find({
+                  success: function(results) {
+                    for(var j = 0; j < results.length; j++){
+                      var input = results[i];
+                      var date = input.get('date');
+                      var value = input.get('value');
+                      alert(date + " " + value);
+                    }
+                      // alert(results);
+                  }
+                });
+                //exerciseInput
+              }
+
+//              for (var i = 0; i < 13; i++){
+  //            //  alert(temp[i]/*.get("date") + ", " + temp.get("value")*/);
+    //          };
 
               // //Creates a subclass of Parse.Object
               // var ExerciseInput = Parse.Object.extend("ExerciseInput");
