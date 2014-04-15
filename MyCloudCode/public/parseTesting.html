@@ -39,16 +39,19 @@
                 alert("Couldn't refresh user!");
               }
             });
-
+            //Get the array of exerciseEntries
             var exerciseArray = user.get("exerciseEntries");
             //debugger;
             for(var i = 0; i < exerciseArray.length; i++){
+              //Get the objectiD of the input
               var exId = exerciseArray[i];
+              //Open on query on the ExerciseInput table
               var inputQuery = new Parse.Query("ExerciseInput");
+              //Look for the matching objectId
               inputQuery.equalTo("objectId", exId);
               inputQuery.find({
                 success: function(result) {
-                  //debugger;
+                  //When you find it, print its date and value variables.
                   console.log("query returned: " + result[0].get("date") + " "
                               + result[0].get("value"));
                 },
