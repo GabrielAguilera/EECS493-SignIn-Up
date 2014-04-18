@@ -1,8 +1,8 @@
 
 // Use Parse.Cloud.define to define as many cloud functions as you want.
 // For example:
-Parse.Cloud.define("acceptFriend", function(request, response, acceptedFriend,
-													updatedFriends, updatedSent) {
+Parse.Cloud.define("acceptFriend", function(request, response, targetFriend,
+													responderUsername) {
   
   // The rest of the function operates on the assumption that request.user is *authorized*
 
@@ -14,7 +14,7 @@ Parse.Cloud.define("acceptFriend", function(request, response, acceptedFriend,
   // user id instead depending on your use case.
 
   var query = new Parse.Query(Parse.User);
-  query.equalTo("username", request.params.acceptedFriend);
+  query.equalTo("username", request.params.targetFriend);
 
   // Get the first user which matches the above constraints.
   query.first({
@@ -25,8 +25,11 @@ Parse.Cloud.define("acceptFriend", function(request, response, acceptedFriend,
       // keys and values you might want to change about
       // this user.
       //anotherUser.set("someKey", "someValue");
-      anotherUser.set("sentRequests", request.params.updatedSent);
-      anotherUser.set("friendUsernames", request.params.updatedFriends);
+      var updatedSentArray = anotherUser.get("sentRequests");
+      var updatedSentArrayIndex = updatedSentArray.indexOf(responderUsername);
+      updatedSentArray.splice(updatedSentArrayIndex, 1);
+      anotherUser.set("sentRequests", updatedSentArray);
+      anotherUser.add("friendUsernames", request.params.responderUsername);
       // Save the user.
       anotherUser.save(null, {
         success: function(anotherUser) {
@@ -46,8 +49,11 @@ Parse.Cloud.define("acceptFriend", function(request, response, acceptedFriend,
   });
 });
 
+
+// Use Parse.Cloud.define to define as many cloud functions as you want.
+// For example:
 Parse.Cloud.define("rejectFriend", function(request, response,
-												rejectedFriend, updatedSent) {
+                                            targetFriend, responderUsername) {
   
   // The rest of the function operates on the assumption that request.user is *authorized*
 
@@ -59,7 +65,7 @@ Parse.Cloud.define("rejectFriend", function(request, response,
   // user id instead depending on your use case.
 
   var query = new Parse.Query(Parse.User);
-  query.equalTo("username", request.params.rejectedFriend);
+  query.equalTo("username", request.params.targetFriend);
 
   // Get the first user which matches the above constraints.
   query.first({
@@ -70,7 +76,10 @@ Parse.Cloud.define("rejectFriend", function(request, response,
       // keys and values you might want to change about
       // this user.
       //anotherUser.set("someKey", "someValue");
-      anotherUser.set("sentRequests", request.params.updatedSent);
+      var updatedSentArray = anotherUser.get("sentRequests");
+      var updatedSentArrayIndex = updatedSentArray.indexOf(responderUsername);
+      updatedSentArray.splice(updatedSentArrayIndex, 1);
+      anotherUser.set("sentRequests", updatedSentArray);
       // Save the user.
       anotherUser.save(null, {
         success: function(anotherUser) {
@@ -90,8 +99,9 @@ Parse.Cloud.define("rejectFriend", function(request, response,
   });
 });
 
-Parse.Cloud.define("sendRequest", function(request, response,
-												desinationFriend, updatedPending) {
+
+Parse.Cloud.define("sendRequest", function(request, response, targetFriend,
+                          senderUsername) {
   
   // The rest of the function operates on the assumption that request.user is *authorized*
 
@@ -103,7 +113,7 @@ Parse.Cloud.define("sendRequest", function(request, response,
   // user id instead depending on your use case.
 
   var query = new Parse.Query(Parse.User);
-  query.equalTo("username", request.params.desinationFriend);
+  query.equalTo("username", request.params.targetFriend);
 
   // Get the first user which matches the above constraints.
   query.first({
@@ -114,8 +124,7 @@ Parse.Cloud.define("sendRequest", function(request, response,
       // keys and values you might want to change about
       // this user.
       //anotherUser.set("someKey", "someValue");
-      anotherUser.set("pendingRequests", request.params.updatedPending);
-      // Save the user.
+      anotherUser.add("pendingRequests", request.params.senderUsername);
       anotherUser.save(null, {
         success: function(anotherUser) {
           // The user was saved successfully.
@@ -133,4 +142,3 @@ Parse.Cloud.define("sendRequest", function(request, response,
     }
   });
 });
-

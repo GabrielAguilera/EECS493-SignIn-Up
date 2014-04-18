@@ -37,7 +37,7 @@ $(document).on("pagecontainerbeforeshow", function(event) {
         friendRequestInit();
     } else if(pageId == "add-friend-popup") {
         addFriendInit();
-    } else if(pageID == "signup-page"){
+    } else if(pageId == "signup-page"){
         signupPageInit();
     }
 });

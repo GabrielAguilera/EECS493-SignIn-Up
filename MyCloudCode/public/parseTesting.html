@@ -20,11 +20,11 @@
         Parse.initialize("PAjzQPglIFtzZyMJfDPe5Ozvfzr7Pz1ukpHoLXct", "zTU8emhQIg5xTKZrhfF5ulrKnXQv4M6ztT9kFi90");
 
       Parse.User.logOut();
-      var username = "username";
-      var password = "password";
+      //var username = "username";
+      //var password = "password";
 
 
-      Parse.User.logIn(username, password, {
+      Parse.User.logIn("wale", "test", {
           success: function (user) {
             // if login is successful
             alert("Welcome, " + user.get("firstName") + " " + user.get("lastName"));
@@ -45,10 +45,11 @@
                 //Looks in the User table
                 var usernameLookup = new Parse.Query(Parse.User);
                 //Searches for that username
-                usernameLookup.equalTo(username, pendingUsername);
+                usernameLookup.equalTo("username", "username");
                 var friendObject = new Parse.User();
                 usernameLookup.first({
                   success: function(friendObject){
+                    debugger;
                     //Grab the returned friend object
                     var friendSentRequests = friendObject.get("sentRequests");
                     //Get the index of the username that just accepted.
