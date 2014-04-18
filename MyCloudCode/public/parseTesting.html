@@ -26,10 +26,143 @@
 
       Parse.User.logIn(username, password, {
           success: function (user) {
-              // if login is successful
+            // if login is successful
             alert("Welcome, " + user.get("firstName") + " " + user.get("lastName"));
             user.increment("loginCounter");
             user.save();
+
+
+/******* ACCEPTING FRIENDS ********/
+
+            //Checks if there's pending requests
+            if(user.get("pendingRequests").length > 0){
+              //Grabs the array.
+              var pendingRequests = user.get("pendingRequests");
+              //Right now, defaults to accepting all of them.
+              for(var i = 0; i < pendingRequests.length; i++){
+                //Gets the username
+                var pendingUsername = pendingRequests[i];
+                //Looks in the User table
+                var usernameLookup = new Parse.Query(Parse.User);
+                //Searches for that username
+                usernameLookup.equalTo(username, pendingUsername);
+                var friendObject = new Parse.User();
+                usernameLookup.first({
+                  success: function(friendObject){
+                    //Grab the returned friend object
+                    var friendSentRequests = friendObject.get("sentRequests");
+                    //Get the index of the username that just accepted.
+                    var sliceIndex = friendSentRequests.indexOf(user.get("username"));
+                    //If it's in range...
+                    if(sliceIndex > -1){
+                      //Splice the friend array.
+                      friendSentRequests.splice(sliceIndex, 1);
+                      //Give it the new array
+                      var targetFriendUsername = friendObject.get("username");
+                      var updatedFriendUsernames = friendObject.get("friendUsernames");
+                      updatedFriendUsernames.push(user.get("username"));
+                      Parse.Cloud.run('acceptFriend', {
+                                                        acceptedFriend: targetFriendUsername,
+                                                        updatedFriends: updatedFriendUsernames,
+                                                        updatedSent: friendSentRequests
+                                                      }, 
+                        {
+                          success: function(result) {
+                            // // the friend was updated successfully
+                            // //Now push that friend username to your friends list.
+                            var updatedPending = user.get("pendingRequests");
+                            var updatedPendingIndex = updatedPending.indexOf(user.get("username"));
+                            updatedPending.splice(updatedPendingIndex,1);
+                            user.add("friendUsernames", targetFriendUsername);
+                            user.set("pendingRequests", updatedPending);
+                            // //Push it to Parse.
+                            user.save();
+                          },
+                          error: function(error) {
+                            alert("Couldn't update remote user." + error.message);
+                          }
+                        });
+                    }
+                  },
+                  error: function(error){
+                    alert("Couldn't find username in Parse. :(");
+                  }
+                });
+              }
+            }
+
+
+            // //Creates a subclass of Parse.Object
+            // var ExerciseInput = Parse.Object.extend("ExerciseInput");
+            // //Calls the constructor for the class
+            // var exerciseInput = new ExerciseInput();
+            // //Sets the variables
+            // exerciseInput.set("date", new Date());
+            // exerciseInput.set("value", 275);
+            // exerciseInput.set("parentId", user.id);
+            // //Saves it to parse
+            // exerciseInput.save(null,{
+            //   success: function(exerciseInput) {
+            //     alert("User has " + user.get("exerciseEntries").length + 
+            //       " entries in the exercise array.");
+            //     alert("New object created with objectId: " + exerciseInput.id);
+            //     //Pushes the new object to the end of the arrays
+            //     user.add("exerciseEntries", exerciseInput.id);
+            //     //Saves it to parse again.
+            //     user.save();
+            //   },
+            //   error: function(error) {
+            //     alert("Couldn't create new input! Please try again.");
+            //   }
+            // });
+
+            // //Creates a subclass of Parse.Object
+            // var CalorieEntries = Parse.Object.extend("CalorieEntries");
+            // //Calls the constructor for the class
+            // var calorieEntries = new CalorieEntries();
+            // //Sets the variables
+            // calorieEntries.set("date", new Date());
+            // calorieEntries.set("calories", 200);
+            // calorieEntries.set("parentId", user.id);
+            // //Saves it to parse
+            // calorieEntries.save(null,{
+            //   success: function(calorieEntries) {
+            //     alert("User has " + user.get("calorieEntries").length + 
+            //       " entries in the food array.");
+            //     alert("New object created with objectId: " + calorieEntries.id);
+            //     //Pushes the new object to the end of the arrays
+            //     user.add("calorieEntries", calorieEntries.id);
+            //     //Saves it to parse again.
+            //     user.save();
+            //   },
+            //   error: function(error) {
+            //     alert("Couldn't create new input! Please try again.");
+            //   }
+            // });
+
+
+            // var WeightEntries = Parse.Object.extend("WeightEntries");
+            // //Calls the constructor for the class
+            // var weightEntries = new WeightEntries();
+            // //Sets the variables
+            // weightEntries.set("date", new Date());
+            // weightEntries.set("calories", 200);
+            // weightEntries.set("parentId", user.id);
+            // //Saves it to parse
+            // weightEntries.save(null,{
+            //   success: function(weightEntries) {
+            //     alert("User has " + user.get("weightEntries").length + 
+            //       " entries in the food array.");
+            //     alert("New object created with objectId: " + weightEntries.id);
+            //     //Pushes the new object to the end of the arrays
+            //     user.add("weightEntries", weightEntries.id);
+            //     //Saves it to parse again.
+            //     user.save();
+            //   },
+            //   error: function(error) {
+            //     alert("Couldn't create new input! Please try again.");
+            //   }
+            // });
 
             user.fetch({
               success: function(user){
@@ -39,27 +172,27 @@
                 alert("Couldn't refresh user!");
               }
             });
-            //Get the array of exerciseEntries
-            var exerciseArray = user.get("exerciseEntries");
-            //debugger;
-            for(var i = 0; i < exerciseArray.length; i++){
-              //Get the objectiD of the input
-              var exId = exerciseArray[i];
-              //Open on query on the ExerciseInput table
-              var inputQuery = new Parse.Query("ExerciseInput");
-              //Look for the matching objectId
-              inputQuery.equalTo("objectId", exId);
-              inputQuery.find({
-                success: function(result) {
-                  //When you find it, print its date and value variables.
-                  console.log("query returned: " + result[0].get("date") + " "
-                              + result[0].get("value"));
-                },
-                error: function(result) {
-                  alert("COULDN'T FIND OBJECT IN TABLE");
-                }
-              });
-            }
+            // //Get the array of exerciseEntries
+            // var exerciseArray = user.get("exerciseEntries");
+            // //debugger;
+            // for(var i = 0; i < exerciseArray.length; i++){
+            //   //Get the objectiD of the input
+            //   var exId = exerciseArray[i];
+            //   //Open on query on the ExerciseInput table
+            //   var inputQuery = new Parse.Query("ExerciseInput");
+            //   //Look for the matching objectId
+            //   inputQuery.equalTo("objectId", exId);
+            //   inputQuery.find({
+            //     success: function(result) {
+            //       //When you find it, print its date and value variables.
+            //       console.log("query returned: " + result[0].get("date") + " "
+            //                   + result[0].get("value"));
+            //     },
+            //     error: function(result) {
+            //       alert("COULDN'T FIND OBJECT IN TABLE");
+            //     }
+            //   });
+            // }
           },
           error: function (user, error) {
               // Show the error message somewhere and let the user try again.
@@ -109,25 +242,6 @@
 //     }
 //   }
 // });
-
-//Creates a subclass of Parse.Object
-// var ExerciseInput = Parse.Object.extend("ExerciseInput");
-// //Calls the constructor for the class
-// var exerciseInput = new ExerciseInput();
-// //Sets the variables
-// exerciseInput.set("date", 1950);
-// exerciseInput.set("value", -0.307);
-// exerciseInput.set("parentId", user.id);
-// //Saves it to parse
-// exerciseInput.save(null,{
-//   success: function(exerciseInput) {
-//     alert("User has " + user.get("exerciseEntries").length + 
-//       " entries in the exercise array.");
-//     alert("New object created with objectId: " + exerciseInput.id);
-//     //Pushes the new object to the end of the arrays
-//     user.add("exerciseEntries", exerciseInput.id);
-//     //Saves it to parse again.
-//     user.save();
     </script>
 
   </div>
