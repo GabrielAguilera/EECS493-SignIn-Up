@@ -91,79 +91,6 @@
               }
             }
 
-
-            // //Creates a subclass of Parse.Object
-            // var ExerciseInput = Parse.Object.extend("ExerciseInput");
-            // //Calls the constructor for the class
-            // var exerciseInput = new ExerciseInput();
-            // //Sets the variables
-            // exerciseInput.set("date", new Date());
-            // exerciseInput.set("value", 275);
-            // exerciseInput.set("parentId", user.id);
-            // //Saves it to parse
-            // exerciseInput.save(null,{
-            //   success: function(exerciseInput) {
-            //     alert("User has " + user.get("exerciseEntries").length + 
-            //       " entries in the exercise array.");
-            //     alert("New object created with objectId: " + exerciseInput.id);
-            //     //Pushes the new object to the end of the arrays
-            //     user.add("exerciseEntries", exerciseInput.id);
-            //     //Saves it to parse again.
-            //     user.save();
-            //   },
-            //   error: function(error) {
-            //     alert("Couldn't create new input! Please try again.");
-            //   }
-            // });
-
-            // //Creates a subclass of Parse.Object
-            // var CalorieEntries = Parse.Object.extend("CalorieEntries");
-            // //Calls the constructor for the class
-            // var calorieEntries = new CalorieEntries();
-            // //Sets the variables
-            // calorieEntries.set("date", new Date());
-            // calorieEntries.set("calories", 200);
-            // calorieEntries.set("parentId", user.id);
-            // //Saves it to parse
-            // calorieEntries.save(null,{
-            //   success: function(calorieEntries) {
-            //     alert("User has " + user.get("calorieEntries").length + 
-            //       " entries in the food array.");
-            //     alert("New object created with objectId: " + calorieEntries.id);
-            //     //Pushes the new object to the end of the arrays
-            //     user.add("calorieEntries", calorieEntries.id);
-            //     //Saves it to parse again.
-            //     user.save();
-            //   },
-            //   error: function(error) {
-            //     alert("Couldn't create new input! Please try again.");
-            //   }
-            // });
-
-
-            // var WeightEntries = Parse.Object.extend("WeightEntries");
-            // //Calls the constructor for the class
-            // var weightEntries = new WeightEntries();
-            // //Sets the variables
-            // weightEntries.set("date", new Date());
-            // weightEntries.set("calories", 200);
-            // weightEntries.set("parentId", user.id);
-            // //Saves it to parse
-            // weightEntries.save(null,{
-            //   success: function(weightEntries) {
-            //     alert("User has " + user.get("weightEntries").length + 
-            //       " entries in the food array.");
-            //     alert("New object created with objectId: " + weightEntries.id);
-            //     //Pushes the new object to the end of the arrays
-            //     user.add("weightEntries", weightEntries.id);
-            //     //Saves it to parse again.
-            //     user.save();
-            //   },
-            //   error: function(error) {
-            //     alert("Couldn't create new input! Please try again.");
-            //   }
-            // });
-
             user.fetch({
               success: function(user){
                     //user has been refreshed.
@@ -172,76 +99,12 @@
                 alert("Couldn't refresh user!");
               }
             });
-            // //Get the array of exerciseEntries
-            // var exerciseArray = user.get("exerciseEntries");
-            // //debugger;
-            // for(var i = 0; i < exerciseArray.length; i++){
-            //   //Get the objectiD of the input
-            //   var exId = exerciseArray[i];
-            //   //Open on query on the ExerciseInput table
-            //   var inputQuery = new Parse.Query("ExerciseInput");
-            //   //Look for the matching objectId
-            //   inputQuery.equalTo("objectId", exId);
-            //   inputQuery.find({
-            //     success: function(result) {
-            //       //When you find it, print its date and value variables.
-            //       console.log("query returned: " + result[0].get("date") + " "
-            //                   + result[0].get("value"));
-            //     },
-            //     error: function(result) {
-            //       alert("COULDN'T FIND OBJECT IN TABLE");
-            //     }
-            //   });
-            // }
           },
           error: function (user, error) {
               // Show the error message somewhere and let the user try again.
               alert("Error: " + error.code + " " + error.message);
           }
       });
-// for(var i = 0; i < aA.length; i++){
-//   //alert(aA[i]);
-// }
-//var inputPointer = Parse.Object();
-// var inputPointer = Parse.Object.extend({
-//   __type: "Pointer",
-//   className: "ExerciseInput",
-//   objectId: 
-// });
-//var input = temp[0];
-//var inputId = input.objectId;
-//user.relation("exerciseEntries");
-//alert(inputId);
-
-// user.get("friendUsernames").forEach(function(element){
-//   var friendsQuery = new Parse.Query(Parse.User);
-//   friendsQuery.equalTo("username", element);
-//   friendsQuery.find({
-//     success: function(result) {
-//         //var profilePhoto = result.get("pic");
-//       var profilePhotoURL = result.get("pic").url();
-//       breakpoint;
-//     },
-//     error: function(error){
-//       alert("Error!");
-//     }
-//   });
-// });
-
-
-// var ExerciseInput = Parse.Object.extend("ExerciseInput");
-// var query = new Parse.Query(ExerciseInput);
-// query.include('user');
-// query.find({
-//   success: function(results) {
-//     for(var j = 0; j < results.length; j++){
-//       var input = results[i];
-//       var date = input.get('date');
-//       var value = input.get('value');
-//       alert(date + " " + value);
-//     }
-//   }
-// });
     </script>
 
   </div>
