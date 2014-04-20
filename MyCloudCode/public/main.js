@@ -14,7 +14,9 @@ var friends = [];
 var sentRequests = [];
 var pendingRequests = [];
 var inputTemplate = {
-    
+    dateNum: null,
+    dateString: null,
+    value: null
 };
 
 // Global Functions
@@ -37,8 +39,6 @@ $(document).on("pagecontainerbeforeshow", function(event) {
         friendRequestInit();
     } else if(pageId == "add-friend-popup") {
         addFriendInit();
-    } else if(pageId == "signup-page"){
-        signupPageInit();
     }
 });
 var compareUsersByUsername = function(a, b) { //intentionally backwards
@@ -72,55 +72,6 @@ var loginPageInit = function() {
             error: function(user, error) {
                 $.mobile.loading('hide');
                 $('#login-form .form-error-text').text("Error: " + error.message);
-            }
-        });
-        return false;
-    });
-};
-
-// Sign-up Page
-var signupPageInit = function() {
-    $("signup-form").submit(function() {
-        var username = $('#signup-form input:text[name=username]').val();
-        var password = $('#signup-form input:password[name=password]').val();
-        $('#signup-form input:password[name=password]').val("");
-        $('#signup-form .form-error-text').text("");
-        $.mobile.loading( 'show', {
-            text: "Signing up...",
-            textVisible: true
-        });
-        user = new Parse.User();
-        user.set("username", username);
-        user.set("password", password);
-        user.set("firstName", firstName);
-        user.set("lastName", lastName);
-        user.set("numAchievements", 10);
-        user.set("achievementArray", [0,0,0,0,0,0,0,0,0,0]);
-        user.set("workoutCounter", 0);
-        user.set("lostWeightCounter", 0);
-        user.set("daysUnderTwoThousandCalorieCounter", 0);
-        user.set("loginCounter", 0);
-        user.set("averageCalDay", 0);
-        user.set("averageExerciseDay", 0);
-        user.set("privateWeight", false);
-        user.set("weightGoal", weightGoal);
-        user.set("weightEntries", []);
-        user.set("exerciseEntries", []);
-        user.set("calorieEntries", []);
-        //user.set("pic");
-        user.set("friendUsernames", []);
-        user.set("sentRequests", []);
-        user.set("pendingRequests", []);
-        user.set("currentWeight", startingWeight);
-        user.set("startingWeight", startingWeight);
-
-        user.signUp(null,{
-            success: function(user) {
-                setUserInformation(user);
-            },
-            error: function(user, error) {
-                //$.mobile.loading('hide');
-                //$('#login-form .form-error-text').text("Error: " + error.message);
             }
         });
         return false;
@@ -180,28 +131,69 @@ var inputPageInit = function() {
 var inputPopupInit = function() {
     if(websiteData.inputType == "Food") {
         $('div[data-role=header] h2').text("Food Input");
-        $('label').text("Enter Your Calories Consumed Today:");
+        $('label').text("Enter Your Calories Consumed:");
         $('input[type=number]').attr("placeholder", "Calories");
     } else if(websiteData.inputType == "Exercise") {
         $('div[data-role=header] h2').text("Exercise Input");
-        $('label').text("Enter Your Hours Exercised Today:");
+        $('label').text("Enter Your Hours Exercised:");
         $('input[type=number]').attr("placeholder", "Hours");
     } else {
         $('div[data-role=header] h2').text("Weight Input");
-        $('label').text("Enter Your Current Weight:");
+        $('label').text("Enter Your Weight:");
         $('input[type=number]').attr("placeholder", "Pounds");
     }
 
     $('#input-popup #input-form').on("submit", function() {
-        var num = $('#input-form input[type=number]').val();
-        if(num == "" || num == null) {
+        $.mobile.loading( 'show', {
+            text: "Adding input...",
+            textVisible: true
+        });
+        var input = $.extend({},inputTemplate);
+        var date = new Date();
+        input.dateNum = Date.now();
+        input.dateString = (date.getMonth()+1) + "/" + date.getDate() + "/" + date.getFullYear();
+        input.value = $('#input-form input[type=number]').val();
+        if(input.value == "" || input.value == null) {
             $('#input-form .form-error-text').text("Please enter a value.");
+            $.mobile.loading('hide');
+        } else if(input.value < 0) {
+            $('#input-form .form-error-text').text("Value should not negative.");
+            $.mobile.loading('hide');
         } else {
-            var num = $('#input-form input[type=number]').val("");
-            websiteData.inputType = null;
-            $.mobile.changePage("input.html");
+            if(websiteData.inputType == "Food") {
+                var arrayLength = user.get('calorieEntries').length;
+                if(arrayLength != 0 && user.get('calorieEntries')[arrayLength - 1].dateString == input.dateString) {
+                    user.get('calorieEntries')[arrayLength - 1].value = parseInt(input.value) + parseInt(user.get('calorieEntries')[arrayLength - 1].value);
+                    user.get('calorieEntries')[arrayLength - 1].dateNum = input.dateNum;
+                } else {
+                    user.get('calorieEntries').push(input);
+                }
+            } else if(websiteData.inputType == "Exercise") {
+                var arrayLength = user.get('exerciseEntries').length;
+                if(arrayLength != 0 && user.get('exerciseEntries')[arrayLength - 1].dateString == input.dateString) {
+                    user.get('exerciseEntries')[arrayLength - 1].value = parseInt(input.value) + parseInt(user.get('exerciseEntries')[arrayLength - 1].value);
+                    user.get('exerciseEntries')[arrayLength - 1].dateNum = input.dateNum;
+                } else {
+                    user.get('exerciseEntries').push(input);
+                }
+            } else {
+                var arrayLength = user.get('weightEntries').length;
+                if(arrayLength != 0 && user.get('weightEntries')[arrayLength - 1].dateString == input.dateString) {
+                    user.get('weightEntries')[arrayLength - 1].value = parseInt(input.value);
+                    user.get('weightEntries')[arrayLength - 1].dateNum = input.dateNum;
+                } else {
+                    user.get('weightEntries').push(input);
+                }
+            }
+            user.save(null, {
+                success: function() {
+                    $('#input-form input[type=number]').val("");
+                    websiteData.inputType = null;
+                    $.mobile.changePage("input.html");
+                }
+            });
         }
-        $('#input-form input:text').val("");
+        $('#input-form input[type=number]').val("");
         return false;
     });
 };
@@ -335,7 +327,10 @@ var confirmClickForRequests = function() {
         if(buddy == user.get('username')) indexForFriend = i;
     });
     friend.get('sentRequests').splice(indexForFriend, 1);
-    //* friend.save();
+    Parse.Cloud.run('acceptFriend', {
+        targetFriend: friend.get('username'),
+        responderUsername: user.get('username')
+    });
     user.get('friendUsernames').push(friend.get('username'));
     user.get('pendingRequests').splice(index, 1);
     websiteData.targetToDelete = $(event.target);
@@ -360,7 +355,10 @@ var denyClickForRequests = function() {
         if(buddy == user.get('username')) indexForFriend = i;
     });
     nonFriend.get('sentRequests').splice(indexForFriend, 1);
-    //* nonFriend.save();
+    Parse.Cloud.run('rejectFriend', {
+        targetFriend: nonFriend.get('username'),
+        responderUsername: user.get('username')
+    });
     pendingRequests.splice(index, 1);
     $(event.target).closest('li').remove();
     checkNoFriendRequests();
@@ -394,10 +392,13 @@ var addFriendInit = function() {
                 if(buddy == user.get('username')) indexForFriend = i;
             });
             friend.get('sentRequests').splice(indexForFriend, 1);
-            //* friend.save();
+            Parse.Cloud.run('acceptFriend', {
+                targetFriend: friend.get('username'),
+                responderUsername: user.get('username')
+            });
             user.get('friendUsernames').push(friend.get('username'));
             user.get('pendingRequests').splice(index, 1);
-            user.save({
+            user.save(null, {
                 success: function() {
                     friends.push(pendingRequests[index]);
                     pendingRequests.splice(index, 1);
@@ -411,31 +412,28 @@ var addFriendInit = function() {
     });
 };
 var alreadyFriend = function(username) {
-    var result = false;
     friends.forEach(function(buddy) {
         if(buddy.get('username') == username) {
-            result = true;
+            return true;
         }
     });
-    return result;
+    return false;
 };
 var alreadyRequested = function(username) {
-    var result = false;
     sentRequests.forEach(function(buddy) {
         if(buddy.get('username') == username) {
-            result = true;
+            return true;
         }
     });
-    return result;
+    return false;
 };
 var alreadyPending = function(username) {
-    var result = -1;
     pendingRequests.forEach(function(buddy, index) {
         if(buddy.get('username') == username) {
-            result = index;
+            return index;
         }
     });
-    return result;
+    return -1;
 };
 var getPersonForRequest = function(username) {
     new Parse.Query(Parse.User).equalTo("username", username).find({
@@ -447,7 +445,10 @@ var getPersonForRequest = function(username) {
                 user.get('sentRequests').push(buddy[0].get('username'));
                 user.save();
                 buddy[0].get('pendingRequests').push(user.get('username'));
-                //* buddy[0].save();
+                Parse.Cloud.run('sendRequest', {
+                    targetFriend: buddy[0].get('username'),
+                    senderUsername: user.get('username')
+                });
                 sentRequests.push(buddy[0]);
                 $.mobile.changePage('friends.html');
             }
