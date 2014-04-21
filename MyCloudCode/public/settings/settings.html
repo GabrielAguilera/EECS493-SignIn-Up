@@ -1,10 +1,62 @@
 <!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title></title>
+<html class="ui-mobile">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../jquerymobile/jquery.mobile.custom.structure.min.css">
+    <link rel="stylesheet" href="../jquerymobile/jquery.mobile.icons-1.4.2.css">
+    <link rel="stylesheet" href="../jquerymobile/simplyOrange.min.css">
+    <link rel="stylesheet" href="../main.css">
+    <script type="text/javascript" src="../jquerymobile/jquery-2.1.0.js"></script>
+    <script type="text/javascript" src="../jquerymobile/jquery.mobile.custom.min.js"></script>
+    <script type="text/javascript" src="../parse/parse-1.2.18.min.js"></script>
+    <script type="text/javascript" src="../main/amcharts_3.4.7.free/amcharts/amcharts.js"></script>
+    <script type="text/javascript" src="../main/amcharts_3.4.7.free/amcharts/serial.js"></script>
+    <script type="text/javascript" src="../main/iosslider/src/jquery.iosslider.js"></script>
 </head>
 <body>
+<div data-role="page" id="settings-page">
+    <div data-role="panel" id="panel">
+        <ul data-role="listview">
+            <li><a href="../main/main.html">Home</a></li>
+            <li><a href="../main/input.html">Input</a></li>
+            <li><a href="../achievements/achievements.html">Achievements</a></li>
+            <li><a href="../friends/friends.html">Friends<span class="ui-li-count">0</span></a></li>
+            <li><a href="../feed/feed.html">Feed</a></li>
+            <li><a href="../settings/settings.html">Settings</a></li>
+            <li><a href="../main/logout.html">Logout</a></li>
+        </ul>
+    </div>
+    <div data-role="header" data-position="fixed">
+        <a href="#panel" data-role="button" data-icon="bars" data-iconpos="notext">Menu</a>
+        <h1>Workout Carrot</h1>
+        <a href="../main/input.html" data-role="button" data-icon="edit" data-iconpos="notext">Input</a>
+    </div>
+    <div data-role="content" id="settingsContent">
+        <form id="saveSettings">
+            <label for="firstNameLabel">Change First Name:</label>
+            <input name="text-basic" id="firstNameLabel" value="" type="text">
 
+            <label for="lastNameLabel">Change Last Name:</label>
+            <input name="text-basic" id="lastNameLabel" value="" type="text">
+
+            <label for="goalWeight">Enter Goal Weight:</label>
+            <input name="number"  id="goalWeight" value="1" type="number">
+
+            <!--<label for="slider2">Keep your weight private to friends:</label>-->
+            <!--<select name="slider2" id="slider2" data-role="slider">-->
+            <!--<option value="off">Off</option>-->
+            <!--<option value="on">On</option>-->
+            <!--</select>-->
+
+            <!--<input type="button" value="Button">-->
+            <input type="submit" value="Save Settings">
+            <!--<input type="reset" value="Reset">-->
+            <div class="form-confirm-text"></div>
+        </form>
+
+        <!--<button class="ui-btn">Save Settings</button>-->
+    </div>
+</div>
+<script type="text/javascript" src="../main.js"></script>
 </body>
 </html>
