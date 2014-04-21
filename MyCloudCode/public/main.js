@@ -121,12 +121,12 @@ var signupPageInit = function() {
         debugger;
         //alert("User selected " + selectedPicture);
 
-        $('#signup-form input:password[name=password]').val("");
-        $('#signup-form .form-error-text').text("");
-        $.mobile.loading( 'show', {
-            text: "Signing up...",
-            textVisible: true
-        });
+//        $('#signup-form input:password[name=password]').val("");
+//        $('#signup-form .form-error-text').text("");
+//        $.mobile.loading( 'show', {
+//            text: "Signing up...",
+//            textVisible: true
+//        });
         user = new Parse.User();
         user.set("username", name.toString());
         user.set("password", password);
@@ -197,7 +197,8 @@ var signupPageInit = function() {
             user.set("pic", parseFile);
             user.signUp(null, {
                 success: function(user){
-                    alert("Sign up successful!");
+                    $.mobile.loading('hide');
+                    //$('#settings-page .form-confirm-text').text('Settings have successfully updated');
                     setUserInformation(user);
                 },
                 error: function(user, error){
@@ -567,28 +568,31 @@ var addFriendInit = function() {
     });
 };
 var alreadyFriend = function(username) {
+    var result = false;
     friends.forEach(function(buddy) {
         if(buddy.get('username') == username) {
-            return true;
+            result = true;
         }
     });
-    return false;
+    return result;
 };
 var alreadyRequested = function(username) {
+    var result = false;
     sentRequests.forEach(function(buddy) {
         if(buddy.get('username') == username) {
-            return true;
+            result = true;
         }
     });
-    return false;
+    return result;
 };
 var alreadyPending = function(username) {
+    var result = -1;
     pendingRequests.forEach(function(buddy, index) {
         if(buddy.get('username') == username) {
-            return index;
+            result = index;
         }
     });
-    return -1;
+    return result;
 };
 var getPersonForRequest = function(username) {
     new Parse.Query(Parse.User).equalTo("username", username).find({
@@ -666,9 +670,7 @@ var achievementInit = function() {
     if (aArray[0]) {
         $("#a1").html(achv0);
         $("#ws1").attr("href", "shareAchievement.html");
-        $("#dup").html(achv0);
     }
-    ;
     if (aArray[1]) {
         $("#a2").html(achv1);
         $("#ws2").attr("href", "shareAchievement.html");
