@@ -114,19 +114,9 @@ var signupPageInit = function() {
         var currentWeight = $('#signup-form input[type=number][name=currentWeight]').val();
 
         var selectedPicture = 0;
-        debugger
         $("input[name=radio-choice]:checked").each(function() {
             selectedPicture = $(this).val();
         });
-        debugger;
-        //alert("User selected " + selectedPicture);
-
-//        $('#signup-form input:password[name=password]').val("");
-//        $('#signup-form .form-error-text').text("");
-//        $.mobile.loading( 'show', {
-//            text: "Signing up...",
-//            textVisible: true
-//        });
         user = new Parse.User();
         user.set("username", name.toString());
         user.set("password", password);
@@ -164,7 +154,6 @@ var signupPageInit = function() {
         var canvas = document.createElement("canvas");
         var img1 = document.createElement("img");
         var dataForParse;
-        debugger;
 
         if(selectedPicture == "choice-1"){
             img1.setAttribute('src', "images/Pelican.png" );
@@ -188,9 +177,7 @@ var signupPageInit = function() {
         canvas.height = img1.height;
         var ctx = canvas.getContext('2d');
         ctx.drawImage(img1, 0, 0);
-        debugger;
         dataForParse = canvas.toDataURL("image/png");
-        debugger;
         var parseFile = new Parse.File("mypic.png", {base64: dataForParse});
         /*******************************************/
         parseFile.save().then(function(){
@@ -198,7 +185,6 @@ var signupPageInit = function() {
             user.signUp(null, {
                 success: function(user){
                     $.mobile.loading('hide');
-                    //$('#settings-page .form-confirm-text').text('Settings have successfully updated');
                     setUserInformation(user);
                 },
                 error: function(user, error){
