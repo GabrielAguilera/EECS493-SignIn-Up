@@ -96,7 +96,7 @@ var loginPageInit = function() {
             },
             error: function(user, error) {
                 $.mobile.loading('hide');
-                $('#login-form .form-error-text').text("Error: " + error.message);
+                $('#login-form .form-error-text').text("Invalid username / password.");
             }
         });
         return false;
@@ -106,6 +106,10 @@ var loginPageInit = function() {
 // Signup Page
 var signupPageInit = function() {
     $("#signup-form").submit(function() {
+        $.mobile.loading( 'show', {
+           text: "Signing up...",
+            textVisible: true
+        });
         var name = $('#signup-form input:text[name=username]').val().toLowerCase();
         var password = $('#signup-form input:password[name=password]').val();
         var firstName = $('#signup-form input:text[name=firstName]').val();
@@ -169,8 +173,6 @@ var signupPageInit = function() {
             img1.setAttribute('src', "images/Frog.png");
         } else if(selectedPicture == "choice-7") {
             img1.setAttribute('src', "images/Pelican.png");
-        } else {
-            alert("Radio buttons broken. :'(");
         }
 
         canvas.width = img1.width;
@@ -180,26 +182,48 @@ var signupPageInit = function() {
         dataForParse = canvas.toDataURL("image/png");
         var parseFile = new Parse.File("mypic.png", {base64: dataForParse});
         /*******************************************/
-        parseFile.save().then(function(){
-            user.set("pic", parseFile);
-            user.signUp(null, {
-                success: function(user){
+        new Parse.Query(Parse.User).equalTo("username", name.toString()).find({
+            success: function (buddy) {
+                if (buddy.length != 0) {
                     $.mobile.loading('hide');
-                    setUserInformation(user);
-                },
-                error: function(user, error){
-                    $.mobile.loading('hide');
-                    $('#login-form .form-error-text').text("Error: " + error.message);
+                    $('#signup-page .form-error-text').text("Username " + name.toString() + " is already taken.");
+                } else {
+                    parseFile.save().then(function(){
+                        user.set("pic", parseFile);
+                        user.signUp(null, {
+                            success: function(user){
+                                //$('#settings-page .form-confirm-text').text('Settings have successfully updated');
+                                setUserInformation(user);
+                            },
+                            error: function(user, error){
+                                $('#login-form .form-error-text').text("Error: " + error.message);
+                            }
+                        });
+                        return false;
+                    });
                 }
-            });
-            return false;
+                return false;
+            }
         });
-
+        return false;
     });
+    return false;
 };
 
 var setUserInformation = function(rUser) {
     user = rUser;
+    var loginTime = Date.now();
+    user.set('loginCounter', user.get('loginCounter') + 1);
+    if(user.get('loginCounter') != 1 && loginTime - user.get('lastLoginTime') < 86400000) {
+        user.set('loginCounter', user.get('loginCounter') - 1);
+    } else {
+        if(user.get('loginCounter') != 1 && loginTime - user.get('lastLoginTime') > 86400000 * 2) {
+            user.set('loginCounter', 0);
+        }
+        user.set('lastLoginTime', loginTime);
+    }
+    setAchievements();
+    user.save();
     // sent friend requests
     user.get('sentRequests').forEach(function(fUsername, index, array) {
         new Parse.Query(Parse.User).equalTo("username", fUsername).find({
@@ -287,6 +311,11 @@ var inputPopupInit = function() {
                     user.get('calorieEntries')[arrayLength - 1].value = parseInt(input.value) + parseInt(user.get('calorieEntries')[arrayLength - 1].value);
                     user.get('calorieEntries')[arrayLength - 1].dateNum = input.dateNum;
                 } else {
+                    if(arrayLength != 0 && parseInt(user.get('calorieEntries')[arrayLength - 1].value) <2000 && parseInt(user.get('calorieEntries')[arrayLength - 1].value) > 0) {
+                        user.set('daysUnderTwoThousandCalorieCounter', user.get('daysUnderTwoThousandCalorieCounter') + 1);
+                    } else if(arrayLength != 0 && (parseInt(user.get('calorieEntries')[arrayLength - 1].value) >= 2000 || parseInt(user.get('calorieEntries')[arrayLength - 1].value) <= 0)) {
+                        user.set('daysUnderTwoThousandCalorieCounter', 0);
+                    }
                     user.get('calorieEntries').push(input);
                 }
             } else if(websiteData.inputType == "Exercise") {
@@ -295,6 +324,9 @@ var inputPopupInit = function() {
                     user.get('exerciseEntries')[arrayLength - 1].value = parseInt(input.value) + parseInt(user.get('exerciseEntries')[arrayLength - 1].value);
                     user.get('exerciseEntries')[arrayLength - 1].dateNum = input.dateNum;
                 } else {
+                    if(arrayLength != 0 && parseInt(user.get('exerciseEntries')[arrayLength - 1].value) > 0) {
+                        user.set('workoutCounter', user.get('workoutCounter') + 1);
+                    }
                     user.get('exerciseEntries').push(input);
                 }
             } else {
@@ -306,6 +338,7 @@ var inputPopupInit = function() {
                     user.get('weightEntries').push(input);
                 }
             }
+            setAchievements();
             user.save(null, {
                 success: function() {
                     $('#input-form input[type=number]').val("");
@@ -416,7 +449,7 @@ var getAverageValue = function(inputArray) {
         sum += parseInt(element.value);
         counter++;
     });
-    return (sum / counter);
+    return Math.round(sum / counter);
 };
 
 // Friend Requests Page
@@ -602,33 +635,35 @@ var getPersonForRequest = function(username) {
 };
 
 //achievements page
-var achv0 = ('<table><tr><td><img src="../achievements/dumbbell.jpg"></td><td><h2 class ="adjust_indent">Beginner Bunny Achieved!</h2>' +
+var achv0 = ('<table><tr><td><img src="../achievements/beginnerBunny.jpg"></td><td><h2 class ="adjust_indent">Beginner Bunny</h2>' +
     '<p class ="adjust_indent">You worked out 5 days in a row</p></td></tr></table>');
-var achv1 = ('<table><tr><td><img src="../achievements/dumbbell.jpg"></td><td><h2 class ="adjust_indent">Healthy Hare Achieved!</h2>' +
+var achv1 = ('<table><tr><td><img src="../achievements/healthyhare.jpg"></td><td><h2 class ="adjust_indent">Healthy Hare</h2>' +
     '<p class ="adjust_indent">You worked out 6 days in a row</p></td></tr></table>');
-var achv2 = ('<table><tr><td><img src="../achievements/dumbbell.jpg"></td><td><h2 class ="adjust_indent">Radical Rabbit Achieved!</h2>' +
+var achv2 = ('<table><tr><td><img src="../achievements/radicalRabbit.jpg"></td><td><h2 class ="adjust_indent">Radical Rabbit</h2>' +
     '<p class ="adjust_indent">You worked out 7 days in a row</p></td></tr></table>');
-var achv3 = ('<table><tr><td><img src="../achievements/healthy.jpg"></td><td><h2 class ="adjust_indent">Baby Carrot Achieved!</h2>' +
+var achv3 = ('<table><tr><td><img src="../achievements/babyCarrot.jpg"></td><td><h2 class ="adjust_indent">Baby Carrot</h2>' +
     '<p class ="adjust_indent">Under 2000 calories 3 days in a row</p></td></tr></table>');
-var achv4 = ('<table><tr><td><img src="../achievements/healthy.jpg"></td><td><h2 class ="adjust_indent">Carrot Pro Achieved!</h2>' +
+var achv4 = ('<table><tr><td><img src="../achievements/carrotPro.jpg""></td><td><h2 class ="adjust_indent">Carrot Pro</h2>' +
     '<p class ="adjust_indent">Under 2000 calories 5 days in a row</p></td></tr></table>');
-var achv5 = ('<table><tr><td><img src="../achievements/scale.jpg"></td><td><h2 class ="adjust_indent">Slim Carrot Achieved!</h2>' +
+var achv5 = ('<table><tr><td><img src="../achievements/slimCarrot.jpg"></td><td><h2 class ="adjust_indent">Slim Carrot</h2>' +
     '<p class ="adjust_indent">Lost 3 pounds from starting weight</p></td></tr></table>');
-var achv6 = ('<table><tr><td><img src="../achievements/scale.jpg"></td><td><h2 class ="adjust_indent">Slender Carrot Achieved!</h2>' +
+var achv6 = ('<table><tr><td><img src="../achievements/slenderCarrot.jpg"></td><td><h2 class ="adjust_indent">Slender Carrot</h2>' +
     '<p class ="adjust_indent">Lost 5 pounds from starting weight</p></td></tr></table>');
-var achv7 = ('<table><tr><td><img src="../achievements/checkmark.jpg"></td><td><h2 class ="adjust_indent">5 Carrot Log Achieved!</h2>' +
+var achv7 = ('<table><tr><td><img src="../achievements/5CarrotLog.jpg"></td><td><h2 class ="adjust_indent">5 Carrot Log</h2>' +
     '<p class ="adjust_indent">Logged in 5 days in a row</p></td></tr></table>');
-var achv8 = ('<table><tr><td><img src="../achievements/checkmark.jpg"></td><td><h2 class ="adjust_indent">10 Carrot Log Achieved!</h2>' +
+var achv8 = ('<table><tr><td><img src="../achievements/10CarrotLog.jpg"></td><td><h2 class ="adjust_indent">10 Carrot Log</h2>' +
     '<p class ="adjust_indent">Logged in 10 days in a row</p></td></tr></table>');
-var achv9 = ('<table><tr><td><img src="../achievements/checkmark.jpg"></td><td><h2 class ="adjust_indent">15 Carrot Log Achieved!</h2>' +
+var achv9 = ('<table><tr><td><img src="../achievements/15CarrotLog.jpg"></td><td><h2 class ="adjust_indent">15 Carrot Log</h2>' +
     '<p class ="adjust_indent">Logged in 15 days in a row</p></td></tr></table>');
 var curAchv;
 var sharedItem;
-var achievementInit = function() {
+var setAchievements = function() {
     var aArray = user.get('achievementArray');
     var workout_counter = user.get("workoutCounter");
     var under_2000 = user.get("daysUnderTwoThousandCalorieCounter");
-    var weight_counter = user.get("currentWeight") - user.get("startingWeight");
+    // Assuming that weightEntries is not empty
+    var currentWeight  = parseInt(user.get('weightEntries')[user.get('weightEntries').length - 1].value);
+    var weight_counter = currentWeight - user.get("startingWeight");
     var login_counter = user.get("loginCounter");
     //    e.preventDefault();
     if (workout_counter >= 5)
@@ -653,46 +688,60 @@ var achievementInit = function() {
         aArray[9] = 1;
     user.set("achievementArray", aArray);
     user.save();
+    return aArray
+};
+var achievementInit = function() {
+    var aArray = setAchievements();
     if (aArray[0]) {
         $("#a1").html(achv0);
         $("#ws1").attr("href", "shareAchievement.html");
+        $('#a1').closest('a').removeClass('ui-disabled');
     }
     if (aArray[1]) {
         $("#a2").html(achv1);
         $("#ws2").attr("href", "shareAchievement.html");
+        $('#a2').closest('a').removeClass('ui-disabled');
     }
     if (aArray[2]) {
         $("#a3").html(achv2);
         $("#ws3").attr("href", "shareAchievement.html");
+        $('#a3').closest('a').removeClass('ui-disabled');
     }
     if (aArray[3]) {
 
         $("#b1").html(achv3);
         $("#hs1").attr("href", "shareAchievement.html");
+        $('#b1').closest('a').removeClass('ui-disabled');
     }
     if (aArray[4]) {
         $("#b2").html(achv4);
         $("#hs2").attr("href", "shareAchievement.html");
+        $('#b2').closest('a').removeClass('ui-disabled');
     }
     if (aArray[5]) {
         $("#c1").html(achv5);
         $("#ls1").attr("href", "shareAchievement.html");
+        $('#c1').closest('a').removeClass('ui-disabled');
     }
     if (aArray[6]) {
         $("#c2").html(achv6);
         $("#ls2").attr("href", "shareAchievement.html");
+        $('#c2').closest('a').removeClass('ui-disabled');
     }
     if (aArray[7]) {
         $("#d1").html(achv7);
         $("#is1").attr("href", "shareAchievement.html");
+        $('#d1').closest('a').removeClass('ui-disabled');
     }
     if (aArray[8]) {
         $("#d2").html(achv8);
         $("#is2").attr("href", "shareAchievement.html");
+        $('#d2').closest('a').removeClass('ui-disabled');
     }
     if (aArray[9]) {
         $("#d3").html(achv9);
         $("#is3").attr("href", "shareAchievement.html");
+        $('#d3').closest('a').removeClass('ui-disabled');
     }
 
     $("#ws1").click(function () {
@@ -1094,7 +1143,6 @@ var chartFunction = function() {
 //
 //$(document).ready(function() {
 //
-////        console.log("helsifmslknmfsonsfkjnslo!!!!");
 //
 //
 //    $('.iosSlider').iosSlider({
@@ -1372,7 +1420,7 @@ var settingsPageInIt = function () {
         goalWeight = this.value; // omit "var" to make it global
         goalNumber = initialWeight - goalWeight;
 
-        $("#dom_element").text(value);
+        $("#dom_element").value(value);
     });
 
 
@@ -1380,7 +1428,7 @@ var settingsPageInIt = function () {
 //        user.set("privateWeight", isPrivate);
         user.set("firstName", firstName);
         user.set("lastName", lastName);
-        user.set("weightGoal", goalWeight);
+        user.set("weightGoal", parseInt(goalWeight));
         user.set("privateWeight", isPrivate);
         $.mobile.loading( 'show', {
             text: "Updating Settings...",
